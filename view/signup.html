@@ -1,0 +1,21 @@
+{ if loggedIn == false }
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<div class="form">
+    <form method="post">
+        { if message is not empty }
+        <p>{{message}}</p>
+        { endif}
+        <input type="text" name="name" value="{{name}}" placeholder="username"><br/><br/>
+        <input type="password" name="pass" value="" placeholder="password"><br/></br>
+        <input type="password" name="cpass" value="" placeholder="confirm password"><br/><br/>
+        <div class="g-recaptcha" data-sitekey="6LeGMyMTAAAAABwnTR89XGcQlqOqtJ_6UBaCSAqt"></div><br/>
+        <input type="submit" value="Signup">
+    </form>
+</div>
+{ else }
+
+<div class="message">
+    <p><a href="/board/login?logout"> Log out? </a></p>
+</div>
+
+{endif}

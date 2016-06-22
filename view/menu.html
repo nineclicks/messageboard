@@ -1,0 +1,18 @@
+<div class="menu">
+    <div class="innermenu">
+        <div class="menuleft">
+            <a href="/board">
+                Home
+            </a>
+        </div>
+        <div class="menuright">
+            {if loggedIn == true}
+            <a href="/board/user?{{info.name}}">
+                {{info.name}} - {{info.score}}
+            </a>
+            {else}
+            Not logged in.
+            {endif}
+        </div>
+    </div>
+</div>

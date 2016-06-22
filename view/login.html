@@ -1,0 +1,21 @@
+{ if loggedIn == false }
+<div class="form">
+    <form method="post">
+        { if message is not empty }
+        <p>{{message}}</p>
+        { endif}
+        <input type="text" name="name" value="{{name}}" placeholder="username"><br/><br/>
+        <input type="password" name="pass" value="" placeholder="password"><br/>
+        <label>
+            Stay logged in<input type="checkbox" name="stay" value="1"><br/>
+        </label>
+        <input type="submit" value="Login">
+    </form>
+</div>
+{ else }
+
+<div class="message">
+    <p><a href="/board/login?logout"> Log out? </a></p>
+</div>
+
+{endif}
