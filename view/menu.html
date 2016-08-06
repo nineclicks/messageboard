@@ -6,13 +6,19 @@
             </a>
         </div>
         <div class="menuright">
-            {if loggedIn == true}
+            {% if loggedIn == true %}
             <a href="/board/user?{{info.name}}">
-                {{info.name}} - {{info.score}}
-            </a>
-            {else}
-            Not logged in.
-            {endif}
+                {{info.name}} - {{info.score}}</a>
+            &emsp;
+            <a href="/board/login">
+                logout</a>
+            {% else %}
+            <a href="/board/login{{returnTo}}">
+                Log in</a>
+             - 
+             <a href="/board/signup{{returnTo}}">
+                Sign up</a>
+            {% endif %}
         </div>
     </div>
 </div>

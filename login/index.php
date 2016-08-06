@@ -1,6 +1,12 @@
 <?php
 ob_start();
-include('../head.php');
+include_once('../model/page.php');
+$page = new Page;
+echo $page->Head();
+
+$db = $page->GetDB();
+$user = $page->GetUser();
+$twig = $page->GetTwig();
 $success = false;;
 $try = false;
 $name = "";
@@ -13,12 +19,15 @@ if (isset($_POST['name'])) {
     $stay = $_POST['stay'];
     $res = $user->Login($name, $pass, $stay);
     if ($res == true) {
+        $db->Log('Login success, user: ' . $name);
         $success = true;
     } else {
+        $db->Log('Failed login, user: ' . $name);
         $success = false;
         $message = "Incorrect username or password.";
     }
 } else if (isset($_GET['logout'])) {
+    $db->Log('Logout, user: ' . $user->GetName());
     $user->Logout();
     $success = true;
 }
@@ -34,4 +43,4 @@ echo $twig->render('login.html', array(
     'name' => $name,
     'message' => $message
 ));
-include('../tail.php');
+echo $page->Tail();

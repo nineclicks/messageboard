@@ -1,0 +1,11 @@
+<div class="cont">
+    {% for board in boards %}
+    <div class="row"
+        onclick="location.href='/board/{{board.name}}/';">
+        <div class="rowboardtitle">
+            <a href="/board/{{board.name}}/">
+                {{board.name}} - {{board.text}}</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>

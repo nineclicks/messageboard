@@ -19,8 +19,26 @@ class User {
         $this->db = $database;
     }
 
-    public function GetInfo() {
-        return $this->info;
+    public function GetInfo($clientSide = false) {
+        $arr = $this->info;
+        if ($clientSide) {
+            unset($arr['id']);
+        }
+        return $arr;
+    }
+
+    public function GetID() {
+        if (!$this->loggedIn)
+            return 0;
+
+        return $this->info['id']; 
+    }
+
+    public function GetStatus() {
+        if (!$this->loggedIn)
+            return 0;
+
+        return $this->info['status']; 
     }
 
     public function GetName() {
@@ -32,6 +50,15 @@ class User {
 
     public function LoggedIn() {
         return $this->loggedIn;
+    }
+
+    public function Signup($name, $hash) {
+        $id = $this->db->CreateUser($name, $hash);
+        if (is_null($id))
+            return false;
+
+        $this->NewSession(intval($id), 0);
+        return true;
     }
 
     public function Login($name, $pass, $stay) {
@@ -68,7 +95,7 @@ class User {
         $token = $_COOKIE['session'];
         $hash = $this->HashToken($token);
         $us = $this->db->GetSession($hash);
-        if ($us === false)
+        if ($us === false || is_null($us[0]['name']))
             return false;
         $this->info = $us[0];
         $this->loggedIn = true;

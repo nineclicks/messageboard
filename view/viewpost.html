@@ -1,0 +1,42 @@
+<script type="text/javascript">
+var comments = {{comments|raw}},
+    postid = '{{postid}}',
+    comTemp = '',
+    userName = '{{user.name}}',
+    userStatus = {{user.status | default('0')}},
+    board = '{{board}}';
+</script>
+
+<script type="text/javascript" src="/board/script/comments.js"></script>
+
+<div class="cont" id="main">
+    <div class="comment" id="{{postid}}">
+
+    </div>
+</div>
+<div class="hidden" id="comTemp">
+    <div class="comhead">
+        <a href="/board/user/{0}">
+            {1}</a>
+        &ensp; {2} point{3}&ensp;{12}
+    </div>
+    <div class="comcontent">
+        {4}
+    </div>
+    <div class="commenu">
+        <a href="/board/{5}/post/{6}">
+            link</a>
+        {% if loggedin == true %}
+        {10}{11}&ensp;
+        <a href="#" onclick="javascript:ShowReply('{7}');return false;">
+            reply</a>
+        {% endif %}
+    </div>
+    <div class="replybox">
+        <textarea name="text"></textarea><br>
+        <input type="button" value="Submit"
+        onclick="javascript:PostReply('{8}');return false;">
+        <input type="button" value="Cancel"
+        onclick="javascript:ShowReply('{9}',true);return false;">
+    </div>
+</div>

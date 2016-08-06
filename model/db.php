@@ -10,10 +10,64 @@ class DB {
         $this->db = new PDO('mysql:host=localhost;dbname=board',
             'board',$pass['sql']
         );
+
+        // Keep INTs as INT when bound to statements
+        $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     }
 
     public function __destruct() {
         $this->db = null;
+    }
+
+    public function Log($message) {
+        $query = 'INSERT INTO log(date,message) VALUES(?,?)';
+        $params = array(time(), $message);
+        $this->ex($query, $params);
+    }
+
+    public function ApprovePost($id) {
+        $query = 'UPDATE post SET status = 1 WHERE code = ?';
+        $this->ex($query, $id);
+    }
+
+    public function DeletePost($id, $user) {
+        $userStatus = $user->GetStatus();
+        $userID = $user->GetID();
+        // Only delete if author is current user or current
+        // user has moderation status (>1).
+        $query = 'UPDATE post SET status = 2 WHERE code = ? AND (author = ? OR ? > 1)';
+        $params = array($id, $userID, $userStatus);
+        $this->ex($query, $params);
+    }
+
+    public function PostReply($newID, $arr) {
+        $query = 'CALL postreply(?,?,?,?,?)';
+        $params = array(
+            $arr['content'],
+            $newID,
+            $arr['parent'],
+            $arr['date'],
+            $arr['name'],
+        );
+        return $this->ex($query, $params);
+    }
+
+    public function GetPost($code, $uid, $mod = 0) {
+        $query = 'CALL getposts(?,?,?)';
+        $params = array($code, $uid, $mod);
+        return $this->ex($query, $params, true);
+    }
+
+    public function GetBoards() {
+        $query = 'SELECT b.name, d.text from board b LEFT JOIN ' . 
+            'boarddesc d ON b.id = d.id';
+        return $this->ex($query);
+    }
+
+    public function GetBoardPosts($board, $start, $count, $uid) {
+        $query = 'SELECT *,(SELECT COUNT(*) FROM post p2 WHERE p2.root = p.id AND (p2.status = 1 OR p2.author = ?)) AS count FROM board b INNER JOIN boardpost bp ON b.id = bp.boardid INNER JOIN post p ON p.id = bp.postid WHERE b.name = ? ORDER BY p.date DESC LIMIT ? OFFSET ?';
+        $params = array($uid, $board, $count, $start);
+        return $this->ex($query, $params);
     }
 
     public function ExpireSession($hash) {
@@ -38,6 +92,11 @@ class DB {
         return $res;        
     }
 
+    public function CreateUser($name, $hash) {
+        $res = $this->ex('CALL createuser(?,BINARY ?)', array($name,$hash));
+        return $res[0]['id'];
+    }
+
     public function NewSession($userid, $hash, $stay) {
         $query = 'INSERT INTO session(hash, expiration, stay, userid) ' . 
             'VALUES(?,?,?,?)';
@@ -51,7 +110,7 @@ class DB {
         $this->ex($query, $arr);
     }
 
-    public function ex($query, $arr = null) {
+    public function ex($query, $arr = null, $group = false) {
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             $bt = debug_backtrace();
@@ -66,7 +125,11 @@ class DB {
             $arr = array($arr);
 
         $stmt->execute($arr);
-        $res = $stmt->fetchAll();
+        $res;
+        if ($group)
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC | PDO::FETCH_UNIQUE);
+        else
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $res;
     }
 
