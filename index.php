@@ -59,7 +59,10 @@ if ($rcount == 0) {
     $post = $request[2];
     $uid = $user->GetID();
     $loggedin = $user->LoggedIn();
-    $postArr = $db->GetPost($post, $uid);
+    $mod = 0;
+    if ($user->GetStatus() > 1)
+        $mod = 1;
+    $postArr = $db->GetPost($post, $uid, $mod);
     $userArr = $user->GetInfo(true);
     echo $twig->render('viewpost.html', array(
         'postid' => $post,

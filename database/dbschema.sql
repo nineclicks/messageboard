@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.49, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: board
 -- ------------------------------------------------------
--- Server version	5.5.49-0ubuntu0.14.04.1
+-- Server version	5.5.50-0ubuntu0.14.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,7 +28,7 @@ CREATE TABLE `board` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -77,10 +77,27 @@ DROP TABLE IF EXISTS `email`;
 CREATE TABLE `email` (
   `id` int(10) unsigned NOT NULL,
   `address` varchar(256) NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   CONSTRAINT `fk_email_1` FOREIGN KEY (`id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `log`
+--
+
+DROP TABLE IF EXISTS `log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `date` int(10) unsigned NOT NULL,
+  `message` varchar(2000) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -115,6 +132,7 @@ CREATE TABLE `post` (
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `parent` int(10) unsigned DEFAULT NULL,
   `content` varchar(10000) DEFAULT NULL,
+  `root` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `code_UNIQUE` (`code`),
@@ -122,7 +140,7 @@ CREATE TABLE `post` (
   KEY `fk_post_2_idx` (`parent`),
   CONSTRAINT `fk_post_1` FOREIGN KEY (`author`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_post_2` FOREIGN KEY (`parent`) REFERENCES `post` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -143,7 +161,7 @@ CREATE TABLE `session` (
   UNIQUE KEY `hash_UNIQUE` (`hash`),
   KEY `fk_session_1_idx` (`userid`),
   CONSTRAINT `fk_session_1` FOREIGN KEY (`userid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,10 +176,11 @@ CREATE TABLE `user` (
   `name` varchar(20) NOT NULL,
   `date` int(10) unsigned NOT NULL,
   `score` int(11) NOT NULL DEFAULT '0',
-  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -204,6 +223,109 @@ CREATE TABLE `vote` (
 --
 -- Dumping routines for database 'board'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `createuser` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`board`@`localhost` PROCEDURE `createuser`(
+IN name_in VARCHAR(20),
+IN hash_in BINARY(60)
+)
+BEGIN
+	INSERT INTO user(`name`, `date`)
+	VALUES(name_in, UNIX_TIMESTAMP());
+
+	INSERT INTO `password`(id, `hash`)
+	VALUES(LAST_INSERT_ID(), hash_in);
+
+	SELECT LAST_INSERT_ID() as id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getposts` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`board`@`localhost` PROCEDURE `getposts`(
+IN code_in VARCHAR(16),
+IN uid_in INT(10) UNSIGNED,
+IN mod_in TINYINT
+)
+BEGIN
+SELECT id INTO @pid FROM post WHERE code = code_in;
+SELECT code, (IF(status <> 2,content,'[deleted]')) as 'content', parentcode as 'parent', name, score, date, status
+FROM (SELECT post.*, user.name, p2.code as 'parentcode' FROM post
+	INNER JOIN user ON post.author = user.id
+    LEFT JOIN post p2 ON post.parent = p2.id
+	ORDER BY parent, id) post_sorted,
+	(SELECT @pv := @pid) initialisation
+WHERE ((find_in_set(parent, @pv) > 0
+AND @pv := concat(@pv, ',', id))
+OR (id = @pid))
+-- only show post if it is approved or by the person requesting it
+AND (status > 0 OR author = uid_in OR mod_in = 1);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `postreply` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`board`@`localhost` PROCEDURE `postreply`(
+content_in VARCHAR(10000),
+code_in VARCHAR(16),
+parent_in VARCHAR(16),
+date_in int(10),
+author_in VARCHAR(20)
+)
+BEGIN
+DECLARE parentid INT(10);
+DECLARE userid INT(11);
+DECLARE parentroot INT(10);
+DECLARE usertype TINYINT(3);
+DECLARE poststatus TINYINT(3);
+
+SELECT id, root INTO parentid, parentroot FROM post WHERE code = parent_in;
+SELECT id, status INTO userid, usertype FROM user WHERE name = author_in;
+
+-- if parentroot is null then use parentid (parent is the root)
+SET parentroot = IFNULL(parentroot, parentid);
+
+-- Auto approve comment if user is mod/admin
+SET poststatus = IF(usertype > 1, 1, 0);
+
+INSERT INTO post(code, date, author, parent, content, root, status)
+	VALUES (code_in, date_in, userid, parentid, content_in, parentroot, poststatus);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `verifytoken` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -260,4 +382,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-06-21 23:52:49
+-- Dump completed on 2016-08-10 19:32:37
