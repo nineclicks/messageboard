@@ -19,6 +19,8 @@ $pass = array(
 );
       ```
     * Apache config
+     * Enable rewrite with command `a2enmod rewrite`
+     * Add following to apache config file usually located in `/etc/apache2/sites-available`
      ```
 RewriteEngine On
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-f
@@ -33,3 +35,4 @@ RewriteCond %{DOCUMENT_ROOT}/board/user/$1/index.php !-f
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-d
 RewriteRule ^/board/user/([a-zA-Z0-9\_\-\.]*) /board/user/index.php?$1 [L]
      ```
+     * restart apache `service apache2 restart`
