@@ -32,7 +32,7 @@ if (isset($_POST['name'])) {
             if ($user->Signup($name,$hash) == true) {
                 $db->Log('Signup success, user: ' . $name);
                 ob_end_clean();
-                header('Location: https://ngardnerdev.com/board/');
+                header('Location: ' . getenv('BOARD_PATH'));
                 exit();
             } else {
                 $message = "Username is already taken.";
@@ -62,10 +62,9 @@ function CheckUsername($name) {
 }
 
 function CaptchaResponse($response) {
-    include('/var/www/pw.php');
     $url = 'https://google.com/recaptcha/api/siteverify';
     $data = array(
-        'secret'        => $pass['captcha'],
+        'secret'        => getenv('CAPTCHA_KEY'),
         'response'      => $response);
     $options = array(
         'http'  => array(

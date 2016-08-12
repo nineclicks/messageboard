@@ -4,11 +4,9 @@ class DB {
 
     private $db;
 
-
     public function __construct() {
-        include('/var/www/pw.php');
         $this->db = new PDO('mysql:host=localhost;dbname=board',
-            'board',$pass['sql']
+            'board',getenv('SQL_PASS')
         );
 
         // Keep INTs as INT when bound to statements

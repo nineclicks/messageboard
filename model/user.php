@@ -14,8 +14,7 @@ class User {
     private $loggedIn = false;
 
     public function __construct($database) {
-        include('/var/www/pw.php');
-        $this->sesSalt = $pass['sesSalt'];
+        $this->sesSalt = getenv('SESSION_SALT');
         $this->db = $database;
     }
 
@@ -81,7 +80,15 @@ class User {
         $token = $_COOKIE['session'];
         $hash = $this->HashToken($token);
         $this->db->ExpireSession($hash);
-        setcookie('session',"",time() - 3600,'/',null,true,true);
+        setcookie(
+            'session',
+            "",
+            time() - 3600,
+            getenv('BOARD_PATH'),
+            false,
+            getenv('HTTPS'),
+            true
+        );
         $this->loggedIn = false;
         $this->info = null;
         return true;
@@ -110,7 +117,15 @@ class User {
         if ($stay == true)
             $time = time() + 86400 * 365;
 
-        setcookie('session',$token,$time,'/',null,true,true);
+        setcookie(
+            'session',
+            $token,
+            $time,
+            getenv('BOARD_PATH'),
+            false,
+            getenv('HTTPS'),
+            true
+        );
         $this->db->NewSession($userid, $hash, $stay);
     }
 

@@ -1,22 +1,22 @@
 <div class="menu">
     <div class="innermenu">
         <div class="menuleft">
-            <a href="/board">
+            <a href="{{BOARD_PATH}}">
                 Home
             </a>
         </div>
         <div class="menuright">
             {% if loggedIn == true %}
-            <a href="/board/user?{{info.name}}">
+            <a href="{{BOARD_PATH}}user?{{info.name}}">
                 {{info.name}} - {{info.score}}</a>
             &emsp;
-            <a href="/board/login">
+            <a href="{{BOARD_PATH}}login">
                 logout</a>
             {% else %}
-            <a href="/board/login{{returnTo}}">
+            <a href="{{BOARD_PATH}}login{{returnTo}}">
                 Log in</a>
              - 
-             <a href="/board/signup{{returnTo}}">
+             <a href="{{BOARD_PATH}}signup{{returnTo}}">
                 Sign up</a>
             {% endif %}
         </div>

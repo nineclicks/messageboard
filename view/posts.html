@@ -1,7 +1,7 @@
 <div class="cont">
     {% for post in posts %}
     <div class="row">
-        <img src="/board/img/{{post.img}}.jpg">
+        <img src="{{BOARD_PATH}}img/{{post.img}}.jpg">
         <div class="rowright">
             <div class="rowtitle">
                 <a href="{{post.url}}">
@@ -9,7 +9,7 @@
                 </a>
             </div>
             <div class="rowmenu">
-                <a href="/board/{{post.name}}/post/{{post.code}}">
+                <a href="{{BOARD_PATH}}{{post.name}}/post/{{post.code}}">
                     Comments ({{post.count}})
                 </a>
             </div>

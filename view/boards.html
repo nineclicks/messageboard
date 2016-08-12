@@ -1,9 +1,9 @@
 <div class="cont">
     {% for board in boards %}
     <div class="row"
-        onclick="location.href='/board/{{board.name}}/';">
+         onclick="location.href='{{BOARD_PATH}}{{board.name}}/';">
         <div class="rowboardtitle">
-            <a href="/board/{{board.name}}/">
+            <a href="{{BOARD_PATH}}{{board.name}}/">
                 {{board.name}} - {{board.text}}</a>
         </div>
     </div>

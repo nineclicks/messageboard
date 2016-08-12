@@ -92,7 +92,7 @@ function PostReply(id) {
     var tb = document.getElementById(id).getElementsByTagName('textarea')[0];
     var replyText = tb.value;
     tb.value = '';
-    PostRequest("/board/submit.php",
+    PostRequest(boardPath + "submit.php",
             "type=reply" + 
             "&replyText=" + encodeURIComponent(replyText) + 
             "&id=" + id,
@@ -122,7 +122,7 @@ function DeleteCom(id) {
     if (res == true) {
         var com = document.getElementById(id).getElementsByClassName('comcontent')[0];
         com.innerText = '[deleted]';
-        PostRequest("/board/submit.php",
+        PostRequest(boardPath + "submit.php",
                 "type=delete" + 
                 "&id=" + id,
                 DeleteResponse);
@@ -140,7 +140,7 @@ function DeleteResponse(resp) {
 function Approve(id) {
     var button = document.getElementById(id).getElementsByTagName("span")[0];
     button.innerHTML = "";
-    PostRequest("/board/submit.php",
+    PostRequest(boardPath + "submit.php",
             "type=approve" + 
             "&id=" + id,
             ApproveResp);

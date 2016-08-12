@@ -1,8 +1,8 @@
 <?php
-$root = $_SERVER['DOCUMENT_ROOT'];
-include_once($root . '/board/model/db.php');
-include_once($root . '/board/model/user.php');
-include_once($root . '/board/model/web.php');
+$root = $_SERVER['DOCUMENT_ROOT'] . getenv('BOARD_PATH');
+include_once($root . 'model/db.php');
+include_once($root . 'model/user.php');
+include_once($root . 'model/web.php');
 
 class Page {
     private $twigLoaded = false;
@@ -24,14 +24,14 @@ class Page {
         ));
         $loggedIn = $this->user->LoggedIn();
 
-        $rt = '/board/';
+        $rt = getenv('BOARD_PATH');
         $uri = substr($_SERVER['REQUEST_URI'],strlen($rt));
         if ($ret && !empty($uri)) {
             $returnTo = '?return=' . $uri;
         } else {
             $returnTo = '';
         }
-
+        
         $returnStr .= $this->twig->render('menu.html', array(
             'loggedIn'=>$loggedIn,
             'info'=>$this->user->GetInfo(),
@@ -67,10 +67,11 @@ class Page {
             return;
         $this->twigLoaded = true;
 
-        require_once $root . '/vendor/autoload.php';
-        $twigpath = $root . '/board/view';
+        require_once '/var/www/html/vendor/autoload.php';
+        $twigpath = $root . 'view';
         $loader = new Twig_Loader_Filesystem($twigpath);
         $this->twig = new Twig_Environment($loader);
+        $this->twig->addGlobal('BOARD_PATH',getenv('BOARD_PATH'));
     }
 
     private function LoadUser() {

@@ -16,7 +16,7 @@ if (isset($_POST['name'])) {
     $try = true;
     $name = $_POST['name'];
     $pass = $_POST['pass'];
-    $stay = $_POST['stay'];
+    $stay = (isset($_POST['stay']) && $_POST['stay']);
     $res = $user->Login($name, $pass, $stay);
     if ($res == true) {
         $db->Log('Login success, user: ' . $name);
@@ -34,7 +34,7 @@ if (isset($_POST['name'])) {
 
 if ($success) {
     ob_end_clean();
-    header('Location: https://ngardnerdev.com/board/' . $return);
+    header('Location: ' . getenv('BOARD_PATH') . $return);
 }
 
 ob_end_flush();
