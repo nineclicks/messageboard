@@ -1,16 +1,24 @@
 <div class="cont">
     {% for post in posts %}
+        {% set comments %}
+            {{BOARD_PATH}}{{post.name}}/post/{{post.code}}
+        {% endset %}
+        {% if post.type == 1 %}
+            {% set link = post.url %}
+        {% else %}
+            {% set link = comments %}
+        {% endif %}
     <div class="row">
         <img src="{{BOARD_PATH}}img/{{post.img}}.jpg">
         <div class="rowright">
             <div class="rowtitle">
-                <a href="{{post.url}}">
+                <a href="{{link}}">
                     {{post.title}}
                 </a>
             </div>
             <div class="rowmenu">
-                <a href="{{BOARD_PATH}}{{post.name}}/post/{{post.code}}">
-                    Comments ({{post.count}})
+                <a href="{{comments}}">
+                    Comments ({{post.count - 1}})
                 </a>
             </div>
         </div>

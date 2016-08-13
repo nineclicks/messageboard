@@ -49,7 +49,7 @@ if ($rcount == 0) {
     echo $twig->render('posts.html', array(
         'posts' => $posts,
         'board' => $board,
-        'page' => $pageNum
+        'page'  => $pageNum
     ));
 
 } else if ($rcount > 2) {
@@ -63,13 +63,16 @@ if ($rcount == 0) {
     if ($user->GetStatus() > 1)
         $mod = 1;
     $postArr = $db->GetPost($post, $uid, $mod);
+    $rootID = current(array_slice($postArr,0,1))['root'];
+    $rootPost = $db->GetRootPost($rootID, $uid, $mod)[0];
     $userArr = $user->GetInfo(true);
     echo $twig->render('viewpost.html', array(
-        'postid' => $post,
-        'board' => $board,
+        'rootpost' => $rootPost,
+        'postid'   => $post,
+        'board'    => $board,
         'comments' => json_encode($postArr),
         'loggedin' => $loggedin,
-        'user' => $userArr
+        'user'     => $userArr
     ));
 } else {
     // User is requesting something weird

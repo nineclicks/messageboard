@@ -46,8 +46,13 @@ function BuildComment(id) {
         }
 
         let timeStr = TimeString(parseInt(com.date));
+        if (com.score == 1) {
+            var plural = "";
+        } else {
+            var plural = "s";
+        }
         var arr = [com.name,com.name,com.score,
-            "s",com.content,board,id,id,
+            plural,com.content,board,id,id,
             id,id,del,mod,timeStr];
         comStr = ArrayReplace(comTemp, arr);
     }
@@ -55,7 +60,7 @@ function BuildComment(id) {
     for (i in com.child) {
         comStr += '<div class="comment" id="' + com.child[i] + '"></div>';
     }
-    if (com.parent == null) {
+    if (com.parent === null) {
         thisDiv = document.getElementById("main");
         com.alt = 0;
     } else {

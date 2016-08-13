@@ -50,6 +50,12 @@ class DB {
         return $this->ex($query, $params);
     }
 
+    public function GetRootPost($rootID, $uid, $mod = 0) {
+        $query = 'SELECT p.code, p.score, p.date, u.name, p.status, p.content, bp.type, bp.title, bp.img, bp.url FROM post p INNER JOIN boardpost bp ON p.id = bp.postid INNER JOIN user u ON u.id = p.author WHERE p.id = ? AND (p.status = 1 OR u.id = ? OR ?)';
+        $params = array($rootID, $uid, $mod);
+        return $this->ex($query, $params);
+    }
+
     public function GetPost($code, $uid, $mod = 0) {
         $query = 'CALL getposts(?,?,?)';
         $params = array($code, $uid, $mod);

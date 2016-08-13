@@ -1,3 +1,8 @@
+{% if rootpost.score == 1 %}
+    {% set plural = "" %}
+{% else %}
+    {% set plural = "s" %}
+{% endif %}
 <script type="text/javascript">
 var comments = {{comments|raw}},
     postid = '{{postid}}',
@@ -9,6 +14,40 @@ var comments = {{comments|raw}},
 </script>
 
 <script type="text/javascript" src="{{BOARD_PATH}}script/comments.js"></script>
+
+<div class="rootbox" id="rootbox">
+    <div class="comhead">
+        <a href="{{BOARD_PATH}}user/{{rootpost.name}}">
+            {{rootpost.name}}</a>
+        &ensp; {{rootpost.score}} point{{plural}}&ensp;
+    </div>
+    <div style="display: inline-block;">
+    {% if rootpost.type == 1 %}
+    <img src="{{BOARD_PATH}}img/{{rootpost.img}}.jpg">
+    <div class="rowright">
+        <div class="rowtitle">
+            <a href="{{rootpost.url}}">
+                {{rootpost.title}}
+            </a>
+        </div>
+    </div>
+    {% else %}
+    {{rootpost.content}}
+    {% endif %}
+    </div>
+    <div class="commenu">
+        {% if loggedin == true %}
+        {% if rootpost.name == user.name or user.status > 1 %}
+           delete 
+        {% endif %}
+        {% if user.status > 1 and rootpost.status == 0 %}
+            approve
+        {% endif %}
+        <a href="#" onclick="javascript:ShowReply('{7}');return false;">
+            reply</a>
+        {% endif %}
+    </div>
+</div>
 
 <div class="cont" id="main">
     <div class="comment" id="{{postid}}">
@@ -36,8 +75,8 @@ var comments = {{comments|raw}},
     <div class="replybox">
         <textarea name="text"></textarea><br>
         <input type="button" value="Submit"
-        onclick="javascript:PostReply('{8}');return false;">
+                             onclick="javascript:PostReply('{8}');return false;">
         <input type="button" value="Cancel"
-        onclick="javascript:ShowReply('{9}',true);return false;">
+                             onclick="javascript:ShowReply('{9}',true);return false;">
     </div>
 </div>
